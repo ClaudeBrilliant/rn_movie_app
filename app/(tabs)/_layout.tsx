@@ -4,9 +4,6 @@ import { StyleSheet } from 'react-native'
 const _layout = () => {
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false, // This hides headers for all tabs
-      }}
     >
       <Tabs.Screen 
         name="index" 
