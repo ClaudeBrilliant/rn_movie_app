@@ -1,13 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Link } from "expo-router";
+import { Text, View } from "react-native";
 
-const index = () => {
+export default function Index() {
   return (
-    <View>
-      <Text>index</Text>
+    <View className="flex-1 items-center justify-center bg-white">
+      <Text className="text-5xl text-primary">Welcome!</Text>
+      <Link href="/onboarding" className="text-blue-500">
+        Go to Onboarding
+      </Link>
     </View>
-  )
+  );
 }
-
-export default index
-
-const styles = StyleSheet.create({})
