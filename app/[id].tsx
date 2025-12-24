@@ -1,7 +1,7 @@
 import { fetchMovieDetails } from '@/services/api';
 import useFetch from '@/services/useFetch';
-import { useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { icons } from '../constants/icons';
 
 interface movieInfoProps {
@@ -9,15 +9,14 @@ interface movieInfoProps {
   value: string | number | null;
 }
 
-const MovieInfo = ({label, value} : movieInfoProps) => {
-  return (
-    <View className='flex-col items-start justify-center mt-5'>
-      <Text className='text-light-200 text-sm font-normal'>{label}</Text>
-      <Text className='text-light-100 text-sm mt-2 text-base font-bold'>
-        {value || 'N/A'}</Text>
-    </View>
-  )
-};
+const MovieInfo = ({label, value} : movieInfoProps) => (
+  <View className='flex-col items-start justify-center mt-5'>
+    <Text className='text-light-200 text-sm font-normal'>{label}</Text>
+    <Text className='text-light-100 text-base font-bold mt-2'>
+      {value || 'N/A'}
+    </Text>
+  </View>
+)
 
 const MovieDetails = () => {
   const {id} = useLocalSearchParams();
@@ -39,6 +38,12 @@ const MovieDetails = () => {
     );
   }
 
+  // Format currency properly
+  const formatCurrency = (amount: number) => {
+    if (amount === 0) return 'N/A';
+    return `$${(amount / 1_000_000).toFixed(1)}M`;
+  };
+
   return (
     <View className='flex-1 bg-primary'>
       <ScrollView contentContainerStyle={{paddingBottom: 80}}>
@@ -59,28 +64,62 @@ const MovieDetails = () => {
             </Text>
           </View>
           
-          <View className='flex-row items-center mt-2 bg-dark-100 px-2 py-1 rounded-md gap-x-1'>
+          <View className='flex-row items-center bg-dark-100 px-2 py-1 rounded-md gap-x-1 mt-2'>
             <Image source={icons.star} className='size-4' />
             <Text className='text-white font-bold text-sm'>
-              {((movie.vote_average ?? 0) / 2).toFixed(1)}/5
+              {(movie?.vote_average ?? 0).toFixed(1)}/10
             </Text>
             <Text className='text-light-200'>
-              ({movie.vote_count} votes)
+              ({movie?.vote_count} votes)
             </Text>
           </View>
 
-          
-
           {movie.overview && (
-            <View className='mt-4'>
-              <Text className='text-white text-lg font-bold mb-2'>Overview</Text>
-              <Text className='text-light-200 text-base leading-6'>
-                {movie.overview}
-              </Text>
+            <MovieInfo label='Overview' value={movie.overview} />
+          )}
+
+          {movie.genres && movie.genres.length > 0 && (
+            <MovieInfo 
+              label='Genres' 
+              value={movie.genres.map((genre) => genre.name).join(' • ')} 
+            />
+          )}
+
+          <View className='flex flex-row justify-between w-full mt-5'>
+            <View className='flex-1 mr-4'>
+              <MovieInfo 
+                label='Budget' 
+                value={formatCurrency(movie.budget ?? 0)} 
+              />
             </View>
+            <View className='flex-1'>
+              <MovieInfo 
+                label='Revenue' 
+                value={formatCurrency(movie.revenue ?? 0)} 
+              />
+            </View>
+          </View>
+
+          {movie.production_companies && movie.production_companies.length > 0 && (
+            <MovieInfo 
+              label='Production Companies' 
+              value={movie.production_companies.map((company) => company.name).join(', ')} 
+            />
           )}
         </View>
       </ScrollView>
+
+      <TouchableOpacity 
+        className='absolute bottom-5 left-5 right-5 bg-accent rounded-lg py-3.5 flex flex-row items-center justify-center z-50' 
+        onPress={() => router.back()}
+      >
+        <Image 
+          source={icons.arrow} 
+          className='size-5 mr-1 rotate-180' 
+          tintColor="#fff" 
+        />
+        <Text className='text-white font-semibold text-base'>Go back</Text>
+      </TouchableOpacity>
     </View>
   );
 }
