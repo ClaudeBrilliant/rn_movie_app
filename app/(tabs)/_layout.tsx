@@ -2,6 +2,7 @@ import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
 import { Tabs } from 'expo-router'
 import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { UserProvider } from '../context/userContext'
 
 const TabIcon = ({focused, icon, title}: any) => {
   if (focused) {
@@ -24,6 +25,7 @@ const TabIcon = ({focused, icon, title}: any) => {
 
 const _layout = () => {
   return (
+    <UserProvider>
     <Tabs
       screenOptions={{
         tabBarShowLabel:false,
@@ -46,6 +48,7 @@ const _layout = () => {
         },
       }}
     >
+
       <Tabs.Screen 
         name="index" 
         options={{ 
@@ -59,16 +62,29 @@ const _layout = () => {
           )
         }} 
       />
+      <Tabs.Screen 
+        name="help" 
+        options={{ 
+          title: 'Help',
+          headerShown: false,
+          tabBarIcon: ({ focused}) => (
+            <TabIcon  
+            focused={focused} 
+            title="Help" />
+          )
+        }} 
+      />
+
       <Tabs.Screen
-       name = "search"
+       name = "search-history"
         options = {{
-          title : "Search",
+          title : "History",
           headerShown: false,
           tabBarIcon: ({ focused}) => (
             <TabIcon  
             focused={focused} 
             icon={icons.search} 
-            title="Search" />
+            title="History" />
           )
         }}
       />
@@ -85,6 +101,53 @@ const _layout = () => {
           )
         }}
       />
+      <Tabs.Screen 
+        name="about" 
+        options={{ 
+          title: 'About',
+          headerShown: false,
+          tabBarIcon: ({ focused}) => (
+            <TabIcon  
+            focused={focused} 
+            title="About" />
+          )
+        }} 
+      />
+      <Tabs.Screen 
+        name="favorites" 
+        options={{ 
+          title: 'Favorite',
+          headerShown: false,
+          tabBarIcon: ({ focused}) => (
+            <TabIcon  
+            focused={focused} 
+            title="Favorite" />
+          )
+        }} 
+      /><Tabs.Screen 
+        name="login" 
+        options={{ 
+          title: 'Login',
+          headerShown: false,
+          tabBarIcon: ({ focused}) => (
+            <TabIcon  
+            focused={focused} 
+            title="Login" />
+          )
+        }} 
+      />
+      <Tabs.Screen 
+        name="register" 
+        options={{ 
+          title: 'Register',
+          headerShown: false,
+          tabBarIcon: ({ focused}) => (
+            <TabIcon  
+            focused={focused} 
+            title="Register" />
+          )
+        }} 
+      />
       <Tabs.Screen
        name = "profile"
         options = {{
@@ -99,6 +162,7 @@ const _layout = () => {
         }}
       />
     </Tabs>
+    </UserProvider>
   )
 }
 

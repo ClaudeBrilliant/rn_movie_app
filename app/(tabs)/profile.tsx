@@ -1,7 +1,10 @@
 import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Image,
   ScrollView,
   Switch,
@@ -9,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useUser } from '../context/userContext';
 
 interface SettingItemProps {
   icon: any;
@@ -54,8 +58,63 @@ const SettingItem = ({
 );
 
 const Profile = () => {
+  const { user, logout, loading } = useUser();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(true);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              router.replace('/login'); // Navigate to login screen
+            } catch (error) {
+              Alert.alert('Error', 'Failed to logout');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Get user initials
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-primary items-center justify-center">
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View className="flex-1 bg-primary items-center justify-center px-5">
+        <Text className="text-white text-xl mb-4">Please log in to view your profile</Text>
+        <TouchableOpacity
+          className="bg-accent px-8 py-3 rounded-lg"
+          onPress={() => router.push('/login')}
+        >
+          <Text className="text-white font-semibold">Go to Login</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-primary">
@@ -78,17 +137,19 @@ const Profile = () => {
         {/* User Info Card */}
         <View className="mx-5 mb-6 bg-dark-100 rounded-2xl p-6 items-center">
           <View className="w-24 h-24 rounded-full bg-accent items-center justify-center mb-4">
-            <Text className="text-white text-4xl font-bold">JD</Text>
+            <Text className="text-white text-4xl font-bold">
+              {getInitials(user.name)}
+            </Text>
           </View>
-          <Text className="text-white text-xl font-bold mb-1">John Doe</Text>
-          <Text className="text-light-200 text-sm">johndoe@example.com</Text>
+          <Text className="text-white text-xl font-bold mb-1">{user.name}</Text>
+          <Text className="text-light-200 text-sm">{user.email}</Text>
           
-          <TouchableOpacity
+          {/* <TouchableOpacity
             className="mt-4 px-6 py-2 bg-accent rounded-full"
-            onPress={() => {/* Handle edit profile */}}
+            onPress={() => router.push('/edit-profile')}
           >
             <Text className="text-white font-semibold">Edit Profile</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Account Section */}
@@ -100,13 +161,13 @@ const Profile = () => {
             icon={icons.star}
             title="Favorites"
             subtitle="View your favorite movies"
-            onPress={() => {/* Navigate to favorites */}}
+            onPress={() => router.push('/favorites')}
           />
           <SettingItem
             icon={icons.search}
             title="Search History"
             subtitle="Recent searches"
-            onPress={() => {/* Navigate to search history */}}
+            onPress={() => router.push('/search-history')}
           />
         </View>
 
@@ -154,13 +215,13 @@ const Profile = () => {
             icon={icons.star}
             title="Help & Support"
             subtitle="Get help with the app"
-            onPress={() => {/* Navigate to help */}}
+            onPress={() => router.push('/help')}
           />
           <SettingItem
             icon={icons.star}
             title="About"
             subtitle="App version 1.0.0"
-            onPress={() => {/* Navigate to about */}}
+            onPress={() => router.push('/about')}
           />
         </View>
 
@@ -168,7 +229,7 @@ const Profile = () => {
         <View className="px-5 mt-4">
           <TouchableOpacity
             className="bg-red-500 rounded-lg py-4 items-center"
-            onPress={() => {/* Handle logout */}}
+            onPress={handleLogout}
           >
             <Text className="text-white font-bold text-base">Log Out</Text>
           </TouchableOpacity>
